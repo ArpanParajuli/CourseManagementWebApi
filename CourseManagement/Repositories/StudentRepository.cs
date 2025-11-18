@@ -13,10 +13,11 @@ namespace CourseManagement.Repositories
         }
 
 
-        public async Task<IQueryable<Student>> GetAllStudentsAsync()
+        public IQueryable<Student> GetAllStudentsAsync()
         {
-            return  StudentContext.Students
-                                 .Include(s => s.Courses);
+            return StudentContext.Students
+                         .Include(s => s.Courses);
+
         }
 
         public async Task<Student?> GetStudentByIdAsync(int id)

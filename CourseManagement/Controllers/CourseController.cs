@@ -20,7 +20,20 @@ namespace CourseManagement.Controllers
         public async Task<ActionResult<IEnumerable<Course>>> Get()
         {
             var courses = await _courseRepository.GetAllCoursesAsync();
-            return Ok(courses);
+
+            var courseDtos = courses.Select(course => new CourseDto
+            {
+                Id = course.Id,
+                Name = course.Name,
+                Description = course.Description,
+                Students = course.Students.Select(student => new GetStudentDto
+                {
+                    Id = student.Id,
+                    FullName = student.FullName
+                }).ToList()
+            }).ToList();
+
+            return Ok(courseDtos);
         }
 
      

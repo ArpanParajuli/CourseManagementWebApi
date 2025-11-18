@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
+
 
 
 namespace CourseManagement.Models
@@ -15,7 +15,7 @@ namespace CourseManagement.Models
         [StringLength(maximumLength:100)]
         public string Email {get; set;} = string.Empty;
 
-        [JsonIgnore]
+     
         public ICollection<Course> Courses { get; set; } = new List<Course>();
     }
 }

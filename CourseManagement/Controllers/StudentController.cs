@@ -1,7 +1,10 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using CourseManagement.Repositories;
+﻿using CourseManagement.DTOs;
 using CourseManagement.Models;
+using CourseManagement.Repositories;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace CourseManagement.Controllers
 {
@@ -18,9 +21,26 @@ namespace CourseManagement.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Student>>> GetStudents()
+        public async Task<ActionResult<IEnumerable<GetStudentDto>>> GetStudents()
         {
-            var students = await _studentRepository.GetAllStudentsAsync();
+            var query = _studentRepository.GetAllStudentsAsync();
+
+            var students = await query
+                .Select(s => new GetStudentDto
+                {
+                    Id = s.Id,
+                    FullName = s.FullName,
+                    Email = s.Email,
+                    Courses = s.Courses.Select(c => new CourseDto
+                    {
+                        Id = c.Id,
+                        Name = c.Name,
+                        Description = c.Description
+                        
+                    }).ToList()
+                })
+                .ToListAsync();
+
             return Ok(students);
         }
 
