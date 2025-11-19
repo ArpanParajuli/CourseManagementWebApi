@@ -2,50 +2,50 @@
 using CourseManagement.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using CourseManagement.DTOs;
+using CourseManagement.Services;
 namespace CourseManagement.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
     public class CourseController : ControllerBase
     {
-        private readonly ICourseRepository _courseRepository;
+     
 
-        public CourseController(ICourseRepository courseRepository)
+        private readonly ICourseService courseService;
+
+
+
+        public CourseController(ICourseService courseService)
         {
-            _courseRepository = courseRepository;
+            this.courseService = courseService;
         }
 
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Course>>> Get()
+        public async Task<ActionResult<IEnumerable<CourseDto?>>> Get()
         {
-            var courses = await _courseRepository.GetAllCoursesAsync();
-
-            var courseDtos = courses.Select(course => new CourseDto
-            {
-                Id = course.Id,
-                Name = course.Name,
-                Description = course.Description,
-                Students = course.Students.Select(student => new GetStudentDto
-                {
-                    Id = student.Id,
-                    FullName = student.FullName
-                }).ToList()
-            }).ToList();
-
+            var courseDtos = await courseService.GetAllCourses();
             return Ok(courseDtos);
         }
 
      
         [HttpGet("{id}")]
-        public async Task<ActionResult<Course>> GetById(int id)
+        public async Task<ActionResult<CourseDto?>> GetById(int id)
         {
-            var course = await _courseRepository.GetCourseByIdAsync(id);
+            // var course = await _courseRepository.GetCourseByIdAsync(id);
+            var course = await courseService.GetById(id);
 
             if (course == null)
             {
                 return NotFound();
             }
+
+            var sendcourse = new CourseDto
+            {
+                Id = course.Id,
+                Name = course.Name,
+                Description = course.Description,
+            };
 
             return Ok(course);
         }
@@ -54,12 +54,11 @@ namespace CourseManagement.Controllers
         [HttpPost("create")]
         public async Task<ActionResult<Course>> Create([FromBody] Course course)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+
             
-            var newCourse = await _courseRepository.AddCourseAsync(course);
+            // var newCourse = await _courseRepository.AddCourseAsync(course);
+            var newCourse = await courseService.Create(course);
+
 
 
             return Ok("Course created successfully!");
@@ -73,14 +72,11 @@ namespace CourseManagement.Controllers
             {
                 return BadRequest();
             }
+ 
+            // var success = await _courseRepository.UpdateCourseAsync(course);
 
-      
-            if (await _courseRepository.GetCourseByIdAsync(id) == null)
-            {
-                return NotFound();
-            }
+            var success = await courseService.PutCourse(id , course);
 
-            var success = await _courseRepository.UpdateCourseAsync(course);
 
             if (!success)
             {
@@ -93,7 +89,9 @@ namespace CourseManagement.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var success = await _courseRepository.DeleteCourseAsync(id);
+            // var success = await _courseRepository.DeleteCourseAsync(id);
+            var success = await courseService.Delete(id);
+
 
             if (!success)
             {
@@ -106,7 +104,9 @@ namespace CourseManagement.Controllers
         [HttpPost("enroll")]
         public async Task<IActionResult> EnrollStudent([FromBody] EnrollDTO obj)
         {
-            var success = await _courseRepository.EnrollStudentAsync(obj.CourseId, obj.StudentId);
+            // var success = await _courseRepository.EnrollStudentAsync(obj.CourseId, obj.StudentId);
+            var success = await courseService.EnrollStudent(obj);
+
 
             if (!success)
             {
@@ -120,7 +120,8 @@ namespace CourseManagement.Controllers
         [HttpPost("unenroll")]
         public async Task<IActionResult> UnenrollStudent([FromBody] UnEnrollDTO obj)
         {
-            var success = await _courseRepository.UnenrollStudentAsync(obj.CourseId, obj.StudentId);
+            // var success = await _courseRepository.UnenrollStudentAsync(obj.CourseId  , obj.StudentId);
+            var success = await courseService.UnenrollStudent(obj);
 
             if (!success)
             {

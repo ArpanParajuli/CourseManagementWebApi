@@ -30,7 +30,7 @@ namespace CourseManagement.Repositories
         public async Task<Student> AddStudentAsync(Student student)
         {
             await StudentContext.Students.AddAsync(student);
-            await StudentContext.SaveChangesAsync();
+            // await StudentContext.SaveChangesAsync();
             return student;
         }
 
@@ -43,7 +43,8 @@ namespace CourseManagement.Repositories
     studentobj.Email = student.Email;
     studentobj.FullName = student.FullName;
 
-    return await StudentContext.SaveChangesAsync() > 0;
+    // return await StudentContext.SaveChangesAsync() > 0;
+    return true;
 }
  
 
@@ -56,7 +57,7 @@ namespace CourseManagement.Repositories
             }
 
             StudentContext.Students.Remove(student);
-            await StudentContext.SaveChangesAsync();
+            // await StudentContext.SaveChangesAsync();
             return true;
         }
 

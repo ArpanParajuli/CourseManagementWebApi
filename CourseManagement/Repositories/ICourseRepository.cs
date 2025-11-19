@@ -6,10 +6,9 @@ namespace CourseManagement.Repositories
     {
         Task<IEnumerable<Course>> GetAllCoursesAsync();
         Task<Course?> GetCourseByIdAsync(int id);
-        Task<Course> AddCourseAsync(Course course);
+        Task<bool> AddCourseAsync(Course course);
         Task<bool> UpdateCourseAsync(Course course);
         Task<bool> DeleteCourseAsync(int id);
-
         Task<bool> EnrollStudentAsync(int courseId, int studentId);
         Task<bool> UnenrollStudentAsync(int courseId, int studentId);
     }

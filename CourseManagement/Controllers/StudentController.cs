@@ -1,6 +1,7 @@
 ﻿using CourseManagement.DTOs;
 using CourseManagement.Models;
 using CourseManagement.Repositories;
+using CourseManagement.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -13,41 +14,27 @@ namespace CourseManagement.Controllers
     public class StudentController : ControllerBase
     {
         
-         private readonly IStudentRepository _studentRepository;
-
-        public StudentController(IStudentRepository studentRepository)
+        private readonly IStudentService studentService;
+        public StudentController(IStudentService studentService)
         {
-            _studentRepository = studentRepository;
+            this.studentService = studentService;
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<GetStudentDto>>> GetStudents()
         {
-            var query = _studentRepository.GetAllStudentsAsync();
 
-            var students = await query
-                .Select(s => new GetStudentDto
-                {
-                    Id = s.Id,
-                    FullName = s.FullName,
-                    Email = s.Email,
-                    Courses = s.Courses.Select(c => new CourseDto
-                    {
-                        Id = c.Id,
-                        Name = c.Name,
-                        Description = c.Description
-                        
-                    }).ToList()
-                })
-                .ToListAsync();
+ 
+            var allstudents = await studentService.GetStudents();
 
-            return Ok(students);
+            return Ok(allstudents);
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Student>> GetStudent(int id)
         {
-            var student = await _studentRepository.GetStudentByIdAsync(id);
+            var student = await studentService.GetStudent(id);
+            
 
             if (student == null)
             {
@@ -60,27 +47,24 @@ namespace CourseManagement.Controllers
         [HttpGet("{id}/courses")]
         public async Task<ActionResult<IEnumerable<Course>>> GetStudentCourses(int id)
         {
-            var student = await _studentRepository.GetStudentByIdAsync(id);
-            if (student == null)
-            {
-                return NotFound($"Student with ID {id} not found.");
-            }
+            // var student = await _studentRepository.GetStudentByIdAsync(id);
+            // var student = 
 
-            var courses = await _studentRepository.GetStudentCoursesAsync(id);
-            return Ok(courses);
+            // if (student == null)
+            // {
+            //     return NotFound($"Student with ID {id} not found.");
+            // }
+
+            var studentcourses = await studentService.GetStudentCourses(id);
+            return Ok(studentcourses);
         }
 
   
         [HttpPost("create")]
         public async Task<ActionResult<Student>> Create([FromBody] Student student)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-            
-            var newStudent = await _studentRepository.AddStudentAsync(student);
-            
+            // var newStudent = await _studentRepository.AddStudentAsync(student);
+            var newStudent = await studentService.Create(student);
             return CreatedAtAction(nameof(GetStudent), new { id = newStudent.Id }, newStudent);
         }
 
@@ -89,12 +73,14 @@ namespace CourseManagement.Controllers
         public async Task<IActionResult> Edit([FromBody] Student student)
         {
             
-            if (await _studentRepository.GetStudentByIdAsync(student.Id) == null)
-            {
-                return NotFound();
-            }
+            // if (await _studentRepository.GetStudentByIdAsync(student.Id) == null)
+            // {
+            //     return NotFound();
+            // }
 
-            var success = await _studentRepository.UpdateStudentAsync(student);
+            // var success = await _studentRepository.UpdateStudentAsync(student);
+            var success = await studentService.Edit(student);
+
 
             if (!success)
             {
@@ -108,7 +94,9 @@ namespace CourseManagement.Controllers
         [HttpDelete("delete/{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var success = await _studentRepository.DeleteStudentAsync(id);
+            // var success = await _studentRepository.DeleteStudentAsync(id);
+            var success = await studentService.Delete(id);
+
 
             if (!success)
             {

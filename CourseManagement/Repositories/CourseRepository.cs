@@ -9,6 +9,8 @@ namespace CourseManagement.Repositories
     public class CourseRepository : ICourseRepository
     {
         private readonly AppDbContext CourseContext;
+
+        
         public CourseRepository(AppDbContext CourseContext)
         {
             this.CourseContext = CourseContext;
@@ -28,17 +30,18 @@ namespace CourseManagement.Repositories
                                  .FirstOrDefaultAsync(c => c.Id == id);
         }
 
-        public async Task<Course> AddCourseAsync(Course course)
+        public async Task<bool> AddCourseAsync(Course course)
         {
             await CourseContext.Courses.AddAsync(course);
-            await CourseContext.SaveChangesAsync();
-            return course;
+            // await CourseContext.SaveChangesAsync();
+            return true;
         }
 
         public async Task<bool> UpdateCourseAsync(Course course)
         {
             CourseContext.Courses.Update(course);
-            return await CourseContext.SaveChangesAsync() > 0;
+            // return await CourseContext.SaveChangesAsync() > 0;
+            return true;
         }
 
         public async Task<bool> DeleteCourseAsync(int id)
@@ -50,7 +53,8 @@ namespace CourseManagement.Repositories
             }
 
             CourseContext.Courses.Remove(course);
-            return await CourseContext.SaveChangesAsync() > 0;
+            // return await CourseContext.SaveChangesAsync() > 0;
+            return true;
         }
 
         public async Task<bool> EnrollStudentAsync(int courseId, int studentId)
@@ -84,7 +88,8 @@ namespace CourseManagement.Repositories
             }
 
             course.Students.Remove(student); // remove both course id and student id in juntion table
-            return await CourseContext.SaveChangesAsync() > 0;
+            // return await CourseContext.SaveChangesAsync() > 0;
+            return true;
         }
 
 

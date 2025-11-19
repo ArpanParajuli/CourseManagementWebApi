@@ -2,6 +2,9 @@
 using CourseManagement.Repositories;
 using CourseManagement.Data;
 using Microsoft.EntityFrameworkCore;
+using CourseManagement.UnitOfWork;
+using CourseManagement.Services;
+
 
 
 
@@ -12,8 +15,23 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddControllers();
 
+
+// repositories dependency injection
 builder.Services.AddScoped<ICourseRepository, CourseRepository>();
 builder.Services.AddScoped<IStudentRepository, StudentRepository>();
+
+
+// Unit of Work dependency injection
+builder.Services.AddScoped<IUnitOfWork , UnitOfWork>();
+
+
+
+// Service layer dependency
+
+builder.Services.AddScoped<IStudentService ,StudentService>();
+builder.Services.AddScoped<ICourseService , CourseService>();
+
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp", policy =>
