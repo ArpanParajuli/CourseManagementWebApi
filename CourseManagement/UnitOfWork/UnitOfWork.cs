@@ -1,35 +1,41 @@
 ﻿using CourseManagement.Repositories;
 using CourseManagement.Data;
+using CourseManagement.Models;
 
 namespace CourseManagement.UnitOfWork
 {
     public class UnitOfWork : IUnitOfWork
     {
-        private readonly AppDbContext appDbContext;
+      private readonly AppDbContext _context;
+    public IGenericRepository<Student> Students { get; }
+    public IGenericRepository<Course> Courses { get; }
 
-        public IStudentRepository studentRepository {get;}
-        public ICourseRepository courseRepository {get;}
-        public UnitOfWork(AppDbContext appDbContext , IStudentRepository studentRepository , ICourseRepository courseRepository)
-        {
-            this.appDbContext = appDbContext;
-            this.studentRepository = studentRepository;
-            this.courseRepository = courseRepository;
-        }
+    public ICourseRepository   courseRepository {get;}
 
-        // public IStudentRepository studentRepository {get;}
-        // public ICourseRepository courseRepository {get;}
-        // public UnitOfWork(AppDbContext appDbContext)
-        // {
-        //     this.appDbContext = appDbContext;
-        //     studentRepository = new StudentRepository(appDbContext);
-        //     courseRepository = new CourseRepository(appDbContext);
-        // }
+    public IStudentRepository studentRepository {get;}
 
+    public UnitOfWork(AppDbContext context ,
+                     IGenericRepository<Student> Students , 
+                     IGenericRepository<Course> Courses,
+                     ICourseRepository courseRepository,
+                     IStudentRepository studentRepository
+                     )
+    {
+        _context = context;
+        // Students = new GenericRepository<Student>(_context);
+        // Courses = new GenericRepository<Course>(_context);
 
+        this.Students = Students;
+        this.Courses = Courses;
 
-        public async Task<int> SaveAsync()
-        {
-            return await appDbContext.SaveChangesAsync();
-        }
+        this.courseRepository = courseRepository;
+        this.studentRepository = studentRepository;
+        
+    }
+
+    public async Task<int> SaveAsync()
+    {
+        return await _context.SaveChangesAsync();
+    }
     }
 }

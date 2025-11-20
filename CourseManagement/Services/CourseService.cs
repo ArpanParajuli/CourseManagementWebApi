@@ -14,7 +14,7 @@ namespace CourseManagement.Services
         }
         public async Task<IEnumerable<CourseDto?>> GetAllCourses()
         {
-            var courses = await unitOfWork.courseRepository.GetAllCoursesAsync();
+            var courses =  unitOfWork.Courses.GetAllAsync();
 
             var courseDtos = courses.Select(course => new CourseDto
             {
@@ -34,39 +34,40 @@ namespace CourseManagement.Services
 
         public async Task<Course?> GetById(int id)
         {
-            var course = await unitOfWork.courseRepository.GetCourseByIdAsync(id);
+            var course = await unitOfWork.Courses.GetByIdAsync(id);
             return course;
         }
 
 
         public async Task<bool> Create(Course course)
         {    
-          var newCourse = await unitOfWork.courseRepository.AddCourseAsync(course);
+          await unitOfWork.Courses.AddAsync(course);
           await unitOfWork.SaveAsync();
-         return newCourse;
+         return true;
         }
 
 
          public async Task<bool> PutCourse(int id, Course course)
         {
       
-            if (await unitOfWork.courseRepository.GetCourseByIdAsync(id) == null)
+            if (await unitOfWork.Courses.GetByIdAsync(id) == null)
             {
                return false;
             }
 
-            var success = await unitOfWork.courseRepository.UpdateCourseAsync(course);
+             unitOfWork.Courses.Update(course);
             await unitOfWork.SaveAsync();
 
-            return success;
+            return true;
         }
 
 
         public async Task<bool> Delete(int id)
         {
-            var success = await unitOfWork.courseRepository.DeleteCourseAsync(id);
+            var getcourseobj = await unitOfWork.Courses.GetByIdAsync(id);
+            unitOfWork.Courses.Delete(getcourseobj);
             await unitOfWork.SaveAsync();
-            return success; 
+            return true; 
         }
 
 

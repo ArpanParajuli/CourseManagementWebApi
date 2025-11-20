@@ -3,11 +3,11 @@ using CourseManagement.Data;
 using Microsoft.EntityFrameworkCore;
 namespace CourseManagement.Repositories
 {
-    public class StudentRepository : IStudentRepository
+    public class StudentRepository : GenericRepository<Student> ,IStudentRepository
     {
         private readonly AppDbContext StudentContext;
 
-        public StudentRepository(AppDbContext StudentContext)
+        public StudentRepository(AppDbContext StudentContext) : base(StudentContext)
         {
             this.StudentContext = StudentContext;
         }

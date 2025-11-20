@@ -1,9 +1,10 @@
 
-using CourseManagement.Repositories;
 using CourseManagement.Data;
-using Microsoft.EntityFrameworkCore;
-using CourseManagement.UnitOfWork;
+using CourseManagement.Models;
+using CourseManagement.Repositories;
 using CourseManagement.Services;
+using CourseManagement.UnitOfWork;
+using Microsoft.EntityFrameworkCore;
 
 
 
@@ -16,9 +17,15 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddControllers();
 
 
+builder.Services.AddScoped<IGenericRepository<Student>, GenericRepository<Student>>();
+builder.Services.AddScoped<IGenericRepository<Course>, GenericRepository<Course>>();
+
 // repositories dependency injection
 builder.Services.AddScoped<ICourseRepository, CourseRepository>();
 builder.Services.AddScoped<IStudentRepository, StudentRepository>();
+
+
+
 
 
 // Unit of Work dependency injection

@@ -4,11 +4,16 @@ using CourseManagement.UnitOfWork;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CourseManagement.Models;
+using CourseManagement.Repositories;
 namespace CourseManagement.Services
 {
     public class StudentService : IStudentService
     {
         private readonly IUnitOfWork unitOfWork;
+
+        private readonly IStudentRepository studentRepository;
+
+        private readonly ICourseRepository courseRepository;
         public StudentService(IUnitOfWork unitOfWork)
         {
             this.unitOfWork = unitOfWork;
@@ -16,9 +21,9 @@ namespace CourseManagement.Services
 
         public async Task<IEnumerable<GetStudentDto>> GetStudents()
         {
-            var query = unitOfWork.studentRepository.GetAllStudentsAsync();
+            var query = unitOfWork.Students.GetAllAsync();
 
-            var students = await query
+            var students =  query
                 .Select(s => new GetStudentDto
                 {
                     Id = s.Id,
@@ -32,14 +37,14 @@ namespace CourseManagement.Services
 
                     }).ToList()
                 })
-                .ToListAsync();
+                .ToList();
 
             return students;
         }
 
         public async Task<GetStudentDto?> GetStudent(int id)
         {
-            var student = await unitOfWork.studentRepository.GetStudentByIdAsync(id);
+            var student = await unitOfWork.Students.GetByIdAsync(id);
 
             var userdata = new GetStudentDto
             {
@@ -54,7 +59,7 @@ namespace CourseManagement.Services
 
         public async Task<IEnumerable<Course?>> GetStudentCourses(int id)
         {
-            var student = await unitOfWork.studentRepository.GetStudentByIdAsync(id);
+            var student = await unitOfWork.Students.GetByIdAsync(id);
 
           if (student == null)
           {
@@ -66,35 +71,36 @@ namespace CourseManagement.Services
 
          public async Task<Student> Create(Student student)
         {
-            var newStudent = await unitOfWork.studentRepository.AddStudentAsync(student);   
+            await unitOfWork.Students.AddAsync(student);   
             await unitOfWork.SaveAsync();      
-            return newStudent;
+            return student;
         }
 
 
         public async Task<bool> Edit(Student student)
         {
             
-            var isStudentValid = await unitOfWork.studentRepository.GetStudentByIdAsync(student.Id);
+            var isStudentValid = await unitOfWork.Students.GetByIdAsync(student.Id);
             
             if(isStudentValid == null)
             {
                 return false;
             }
 
-             var success = await unitOfWork.studentRepository.UpdateStudentAsync(student);
+             unitOfWork.Students.Update(student);
 
              await unitOfWork.SaveAsync();
 
-             return success;
+             return true;
         }
 
 
         public async Task<bool> Delete(int id)
         {
-            var success = await unitOfWork.studentRepository.DeleteStudentAsync(id);
+            var getstudentobj = await unitOfWork.Students.GetByIdAsync(id);
+             unitOfWork.Students.Delete(getstudentobj);
             await unitOfWork.SaveAsync();
-            return success;
+            return true;
         }
 
 

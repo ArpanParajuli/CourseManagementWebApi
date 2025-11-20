@@ -2,64 +2,65 @@
 using CourseManagement.Models;
 using Microsoft.EntityFrameworkCore;
 using CourseManagement.Repositories;
+using CourseManagement.Migrations;
 
 
 namespace CourseManagement.Repositories
 {
-    public class CourseRepository : ICourseRepository
+    public class CourseRepository : GenericRepository<Course>, ICourseRepository 
     {
         private readonly AppDbContext CourseContext;
 
         
-        public CourseRepository(AppDbContext CourseContext)
+        public CourseRepository(AppDbContext CourseContext) : base(CourseContext)
         {
             this.CourseContext = CourseContext;
         }
 
-        public async Task<IEnumerable<Course>> GetAllCoursesAsync()
-        {
-            return await CourseContext.Courses
-                                 .Include(c => c.Students)
-                                 .ToListAsync();
-        }
+        // public async Task<IEnumerable<Course>> GetAllCoursesAsync()
+        // {
+        //     return await CourseContext.Courses
+        //                          .Include(c => c.Students)
+        //                          .ToListAsync();
+        // }
 
-        public async Task<Course?> GetCourseByIdAsync(int id)
-        {
-            return await CourseContext.Courses
-                                 .Include(c => c.Students)
-                                 .FirstOrDefaultAsync(c => c.Id == id);
-        }
+        // public async Task<Course?> GetCourseByIdAsync(int id)
+        // {
+        //     return await CourseContext.Courses
+        //                          .Include(c => c.Students)
+        //                          .FirstOrDefaultAsync(c => c.Id == id);
+        // }
 
-        public async Task<bool> AddCourseAsync(Course course)
-        {
-            await CourseContext.Courses.AddAsync(course);
-            // await CourseContext.SaveChangesAsync();
-            return true;
-        }
+        // public async Task<bool> AddCourseAsync(Course course)
+        // {
+        //     await CourseContext.Courses.AddAsync(course);
+        //     // await CourseContext.SaveChangesAsync();
+        //     return true;
+        // }
 
-        public async Task<bool> UpdateCourseAsync(Course course)
-        {
-            CourseContext.Courses.Update(course);
-            // return await CourseContext.SaveChangesAsync() > 0;
-            return true;
-        }
+        // public async Task<bool> UpdateCourseAsync(Course course)
+        // {
+        //     CourseContext.Courses.Update(course);
+        //     // return await CourseContext.SaveChangesAsync() > 0;
+        //     return true;
+        // }
 
-        public async Task<bool> DeleteCourseAsync(int id)
-        {
-            var course = await CourseContext.Courses.FindAsync(id);
-            if (course == null)
-            {
-                return false;
-            }
+        // public async Task<bool> DeleteCourseAsync(int id)
+        // {
+        //     var course = await CourseContext.Courses.FindAsync(id);
+        //     if (course == null)
+        //     {
+        //         return false;
+        //     }
 
-            CourseContext.Courses.Remove(course);
-            // return await CourseContext.SaveChangesAsync() > 0;
-            return true;
-        }
+        //     CourseContext.Courses.Remove(course);
+        //     // return await CourseContext.SaveChangesAsync() > 0;
+        //     return true;
+        // }
 
         public async Task<bool> EnrollStudentAsync(int courseId, int studentId)
         {
-            var course = await GetCourseByIdAsync(courseId);
+            var course = await GetByIdAsync(courseId);
             var student = await CourseContext.Students.FindAsync(studentId);
 
             if (course == null || student == null)
@@ -79,7 +80,7 @@ namespace CourseManagement.Repositories
 
         public async Task<bool> UnenrollStudentAsync(int courseId, int studentId)
         {
-            var course = await GetCourseByIdAsync(courseId);
+            var course = await GetByIdAsync(courseId);
             var student = course?.Students.FirstOrDefault(s => s.Id == studentId);
 
             if (course == null || student == null)
